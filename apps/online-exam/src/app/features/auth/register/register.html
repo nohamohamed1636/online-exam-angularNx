@@ -1,0 +1,511 @@
+
+<div class="w-full max-w-[452px] mx-auto font-geist-mono">
+
+  <!-- Progress Indicator -->
+  <div class="flex items-center mb-8">
+
+    @for (step of [1, 2, 3, 4]; track step) {
+
+      <div
+        class="relative w-3 h-3 rotate-45 border border-blue-600"
+        [class.bg-blue-600]="step <= currentStep()"
+        [class.bg-white]="step > currentStep()">
+
+        @if (step === currentStep()) {
+          <div
+            class="absolute -inset-1.5
+                   border-4 border-blue-100">
+          </div>
+        }
+
+      </div>
+
+      @if (step < 4) {
+        <div
+          class="h-px flex-1 border-t border-blue-600"
+          [class.border-dashed]="step >= currentStep()">
+        </div>
+      }
+
+    }
+
+  </div>
+
+  <h1 class="text-[30px] font-semibold text-gray-800 mb-6">
+    Create Account
+  </h1>
+
+  @switch (currentStep()) {
+
+    
+@case (1) {
+  <div>
+    <label
+      for="registerEmail"
+      class="mb-2 block text-sm text-gray-800">
+      Email
+    </label>
+
+    <input
+      id="registerEmail"
+      type="email"
+      [formControl]="email"
+      autocomplete="email"
+      placeholder="user@example.com"
+      [attr.aria-invalid]="!!emailError"
+      [class.border-red-500]="!!emailError"
+      class="w-full border border-gray-200
+             px-3 py-3 text-sm outline-none
+             focus:border-blue-600"
+    />
+
+    @if (emailError) {
+      <p class="mt-2 text-xs text-red-500" role="alert">
+        {{ emailError }}
+      </p>
+    }
+
+    @if (errorMessage()) {
+      <p class="mt-3 text-xs text-red-500" role="alert">
+        {{ errorMessage() }}
+      </p>
+    }
+
+    <!-- <button
+      type="submit"
+      [disabled]="isLoading()"
+      class="mt-10 w-full border border-blue-600
+             bg-blue-50 py-3 text-sm
+             disabled:opacity-50">
+      {{ isLoading() ? 'Sending...' : 'Next  ›' }}
+    </button> -->
+
+     <button
+      type="submit"
+      (click)="sendEmailOtp()"
+      class="mt-10 w-full border border-blue-600
+             bg-blue-50 py-3 text-sm
+             disabled:opacity-50">
+         @if (isLoading()) {
+               Sending OTP...
+         } @else {
+              Next ›
+          }  
+    </button>
+    <p class="mt-3 text-xs text-gray-500">
+  Email valid: {{ email.valid }}
+  | Current step: {{ currentStep() }}
+</p>
+    
+  </div>
+
+  <p class="mt-9 text-center text-sm text-gray-500">
+    Already have an account?
+    <a routerLink="/auth/login" class="text-blue-600">
+      Login
+    </a>
+  </p>
+}
+
+
+    
+@case (2) {
+  <h2 class="text-xl font-semibold text-blue-600">
+    Verify OTP
+  </h2>
+
+  <p class="mt-3 text-sm text-gray-500">
+    Please enter the 6-digit code we have sent to:
+  </p>
+
+  <div class="mt-1 text-sm">
+    <span>{{ email.value }}</span>
+
+    <button
+      type="button"
+      (click)="previousStep()"
+      class="ml-2 text-blue-600 underline">
+      Edit
+    </button>
+  </div>
+
+  <div
+    class="mt-7 flex justify-center gap-3"
+    role="group"
+    aria-label="Six-digit verification code">
+
+    @for (digit of otpDigits(); track $index) {
+      <input
+        #otpInput
+        type="text"
+        inputmode="numeric"
+        autocomplete="one-time-code"
+        maxlength="1"
+        [value]="digit"
+        [attr.aria-label]="'Digit ' + ($index + 1)"
+        (input)="onOtpInput($event, $index)"
+        (keydown)="onOtpKeydown($event, $index)"
+        (paste)="onOtpPaste($event)"
+        class="h-10 w-10 border border-gray-200
+               text-center text-sm outline-none
+               focus:border-blue-600"
+      />
+    }
+  </div>
+
+  @if (otpSubmitted() && otp.invalid) {
+    <p class="mt-3 text-center text-xs text-red-500">
+      Please enter a valid 6-digit code.
+    </p>
+  }
+
+  <div class="mt-7 text-center text-sm text-gray-500">
+    @if (resendSeconds() > 0) {
+      You can request another code in:
+      {{ resendSeconds() }}s
+    } @else {
+      <button
+        type="button"
+        (click)="resendOtp()"
+        class="text-blue-600 underline">
+        Resend Code
+      </button>
+    }
+  </div>
+
+  @if (errorMessage()) {
+    <p class="mt-4 text-center text-xs text-red-500"
+       role="alert">
+      {{ errorMessage() }}
+    </p>
+  }
+
+  <button
+    type="button"
+    (click)="verifyOtp()"
+    [disabled]="isLoading()"
+    class="mt-12 w-full border border-blue-600
+           bg-blue-50 py-3 text-sm
+           disabled:opacity-50">
+     @if (isLoading()) {
+    Verifying...
+  } @else {
+    Verify Code
+  }
+
+  </button>
+}
+
+
+   
+@case (3) {
+  <h2 class="mb-7 text-xl font-semibold text-blue-600">
+    Tell us more about you
+  </h2>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <label for="firstName" class="mb-2 block text-sm">First Name</label>
+      <input
+      id="firstName"
+        type="text"
+        [formControl]="firstName"
+        placeholder="First name"
+        class="w-full border border-gray-200 p-3 text-sm
+               outline-none focus:border-blue-600"
+      />
+
+      @if (firstName.invalid &&
+          (firstName.touched || userInfoSubmitted())) {
+        <p class="mt-1 text-xs text-red-500">
+          Enter at least 3 characters.
+        </p>
+      }
+    </div>
+
+    <div>
+      <label for="lastName" class="mb-2 block text-sm">Last Name</label>
+      <input
+        id="lastName"
+        type="text"
+        [formControl]="lastName"
+        placeholder="Last name"
+        class="w-full border border-gray-200 p-3 text-sm
+               outline-none focus:border-blue-600"
+      />
+
+      @if (lastName.invalid &&
+          (lastName.touched || userInfoSubmitted())) {
+        <p class="mt-1 text-xs text-red-500">
+          Enter at least 3 characters.
+        </p>
+      }
+    </div>
+  </div>
+
+  <div class="mt-5">
+    <label for="username" class="mb-2 block text-sm">Username</label>
+    <input
+      id="username"
+      type="text"
+      [formControl]="username"
+      placeholder="Enter username"
+      class="w-full border border-gray-200 p-3 text-sm
+             outline-none focus:border-blue-600"
+    />
+
+    @if (username.invalid &&
+        (username.touched || userInfoSubmitted())) {
+      <p class="mt-1 text-xs text-red-500">
+        Username must contain at least 8 characters.
+      </p>
+    }
+  </div>
+
+  
+<div class="mt-5">
+
+  <label for="phone" class="mb-2 block text-sm">
+    Phone Number
+  </label>
+
+  <input
+    id="phone"
+    type="tel"
+    inputmode="numeric"
+    autocomplete="tel-national"
+    maxlength="11"
+    [formControl]="phone"
+    placeholder="01XXXXXXXXX"
+    class="w-full border border-gray-200
+           p-3 text-sm outline-none
+           focus:border-blue-600"
+    [class.border-red-500]="
+      phone.invalid &&
+      (phone.touched || userInfoSubmitted())
+    "
+  />
+
+  @if (phone.invalid &&
+      (phone.touched || userInfoSubmitted())) {
+
+    <div class="mt-2 text-xs text-red-500">
+
+      @if (phone.hasError('required')) {
+        <p>Phone number is required.</p>
+      }
+
+      @if (phone.hasError('pattern')) {
+        <p>Please enter a valid Egyptian mobile number.</p>
+      }
+
+    </div>
+
+  }
+
+</div>
+
+
+  <button
+    type="button"
+    (click)="submitUserInfo()"
+    class="mt-10 w-full border border-blue-600
+           bg-blue-50 py-3 text-sm
+           hover:bg-blue-100">
+    Next ›
+  </button>
+}
+
+
+   
+@case (4) {
+
+  <h2 class="mb-7 text-xl font-semibold text-blue-600">
+    Create a strong password
+  </h2>
+
+  <!-- Password -->
+
+  <div class="mb-5">
+
+    <label for="password" class="mb-2 block text-sm">
+      Password
+    </label>
+
+    <div class="relative">
+
+      <input
+        id="password"
+        [type]="showPassword() ? 'text' : 'password'"
+        [formControl]="password"
+        autocomplete="new-password"
+        placeholder="Enter password"
+        class="w-full border border-gray-200
+               p-3 pr-16 text-sm outline-none
+               focus:border-blue-600"
+      />
+
+      <button
+        type="button"
+        (click)="togglePassword()"
+        class="absolute right-3 top-1/2
+               -translate-y-1/2 text-xs text-gray-500">
+
+        <!-- {{ showPassword() ? 'Hide' : 'Show' }} -->
+          @if (showPassword()) {
+            <svg lucideEyeOff [size]="18"></svg>
+          } @else {
+            <svg lucideEye [size]="18"></svg>
+          }
+
+      </button>
+
+    </div>
+
+    @if (password.invalid &&
+        (password.touched || passwordSubmitted())) {
+
+      <div class="mt-2 text-xs text-red-500">
+
+        @if (password.hasError('required')) {
+          <p>Password is required.</p>
+        }
+
+        @if (password.hasError('minlength')) {
+          <p>Use at least 8 characters.</p>
+        }
+
+        @if (password.hasError('uppercase')) {
+          <p>Include an uppercase letter.</p>
+        }
+
+        @if (password.hasError('lowercase')) {
+          <p>Include a lowercase letter.</p>
+        }
+
+        @if (password.hasError('number')) {
+          <p>Include a number.</p>
+        }
+
+        @if (password.hasError('specialCharacter')) {
+          <p>Include a special character.</p>
+        }
+
+      </div>
+    }
+
+  </div>
+
+  <!-- Confirm Password -->
+
+  <div class="mt-5">
+
+    <label for="confirmPassword"
+           class="mb-2 block text-sm">
+      Confirm Password
+    </label>
+
+    <div class="relative">
+
+      <input
+        id="confirmPassword"
+        [type]="showConfirmPassword() ? 'text' : 'password'"
+        [formControl]="confirmPassword"
+        autocomplete="new-password"
+        placeholder="Confirm password"
+        class="w-full border border-gray-200
+               p-3 pr-16 text-sm outline-none
+               focus:border-blue-600"
+      />
+
+      <button
+        type="button"
+        (click)="toggleConfirmPassword()"
+        class="absolute right-3 top-1/2
+               -translate-y-1/2 text-xs text-gray-500">
+
+        <!-- {{ showConfirmPassword() ? 'Hide' : 'Show' }} -->
+          @if (showPassword()) {
+            <svg lucideEyeOff [size]="18"></svg>
+          } @else {
+            <svg lucideEye [size]="18"></svg>
+          }
+
+      </button>
+
+    </div>
+
+    @if (confirmPassword.touched || passwordSubmitted()) {
+
+      @if (confirmPassword.hasError('required')) {
+        <p class="mt-2 text-xs text-red-500">
+          Confirm password is required.
+        </p>
+      }
+
+      @if (registerForm.hasError('passwordMismatch')) {
+        <p class="mt-2 text-xs text-red-500">
+          Passwords do not match.
+        </p>
+      }
+
+    }
+
+  </div>
+
+  @if (errorMessage()) {
+    <p class="mt-3 text-xs text-red-500" role="alert">
+      {{ errorMessage() }}
+    </p>
+  }
+
+  <!-- Create Account Button -->
+
+  
+@if (errorMessage()) {
+
+  <div class="mt-4 border border-red-200
+              bg-red-50 p-3 text-sm text-red-600"
+       role="alert">
+
+    <p class="font-semibold">
+      {{ errorMessage() }}
+    </p>
+
+    @if (serverErrors().length > 0) {
+
+      <ul class="mt-2 list-disc pl-5">
+
+        @for (error of serverErrors(); track $index) {
+          <li class="mt-1 text-xs">
+            {{ error }}
+          </li>
+        }
+
+      </ul>
+
+    }
+
+  </div>
+
+}
+
+
+  <button
+    type="button"
+    (click)="createAccount()"
+    [disabled]="isLoading()"
+    class="mt-10 w-full border border-blue-600
+           bg-blue-50 py-3 text-sm
+           hover:bg-blue-100 disabled:opacity-50">
+
+    {{ isLoading() ? 'Creating Account...' : 'Create Account' }}
+
+  </button>
+
+}
+
+  }
+
+</div>
+

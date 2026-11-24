@@ -1,0 +1,175 @@
+
+<div class="w-full">
+
+  <h2 class="text-2xl font-bold text-gray-900 mb-8">
+    Login
+  </h2>
+
+  <form
+    [formGroup]="loginForm"
+    (ngSubmit)="onSubmit()"
+    novalidate
+    class="space-y-5">
+
+    <!-- Username -->
+    <div>
+      <label
+        for="username"
+        class="auth-small-medium-text block mb-2">
+        Username
+      </label>
+
+      <input
+        id="username"
+        type="text"
+        formControlName="username"
+        autocomplete="username"
+        placeholder="user123"
+        [attr.aria-invalid]="shouldShowError(username)"
+        [class.border-red-500]="shouldShowError(username)"
+        [class.border-gray-300]="!shouldShowError(username)"
+        class="auth-small-text w-full border
+               rounded-md
+               px-4 py-3
+               focus:outline-none
+               focus:ring-2 focus:ring-blue-500"/>
+
+      @if (username.invalid && username.touched) {
+        <div class="flex items-center gap-2 mt-2 text-red-500"
+             role="alert">
+
+          <svg lucideCircleAlert [size]="14"></svg>
+
+          @if (username.hasError('required')) {
+            <span class="text-xs">
+              Username is required.
+            </span>
+          } @else if (username.hasError('minlength')) {
+            <span class="text-xs">
+              Username must be at least 5 characters.
+            </span>
+          }@else if (username.hasError('whitespace')) {
+            <span class="text-xs">
+              Username cannot contain whitespace.
+            </span>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Password -->
+    <div>
+      <label
+        for="password"
+        class="auth-small-medium-text block mb-2">
+        Password
+      </label>
+
+      <div class="relative">
+
+        <input
+          id="password"
+          formControlName="password"
+          [type]="showPassword() ? 'text' : 'password'"
+          autocomplete="current-password"
+          placeholder="Enter your password"
+          [attr.aria-invalid]="shouldShowError(password)"
+          [class.border-red-500]="shouldShowError(password)"
+          [class.border-gray-300]="!shouldShowError(password)"
+          class="auth-small-text w-full border
+                  rounded-md
+                 px-4 py-3 pr-12
+                 focus:outline-none
+                 focus:ring-2 focus:ring-blue-500"/>
+
+        <button
+          type="button"
+          (click)="togglePassword()"
+          [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+          class="absolute right-3 top-1/2
+                 -translate-y-1/2 text-gray-500">
+
+          @if (showPassword()) {
+            <svg lucideEyeOff [size]="18"></svg>
+          } @else {
+            <svg lucideEye [size]="18"></svg>
+          }
+
+        </button>
+      </div>
+
+      @if (shouldShowError(password)) {
+        <div class="flex items-center gap-2 mt-2 text-red-500"
+             role="alert">
+
+          <svg lucideCircleAlert [size]="14"></svg>
+
+          @if (password.hasError('required')) {
+            <span class="text-xs">
+              Password is required.
+            </span>
+          } @else if (password.hasError('minlength')) {
+            <span class="text-xs">
+              Password must be at least 8 characters.
+            </span>
+          }@else if (password.hasError('whitespace')) {
+            <span class="text-xs">
+              Password cannot contain whitespace.
+            </span>
+          }
+        </div>
+      }
+
+
+
+    </div>
+
+    <!-- Forgot Password -->
+    <div class="text-right">
+      <a
+         routerLink="/forgot-password"
+         class="text-blue-600 text-sm hover:underline">
+         Forgot Password?
+      </a>
+    </div>
+
+@if (loginError()) {
+  <div
+    role="alert"
+    class="mt-4 flex items-center gap-2
+           rounded-md border border-red-300
+           bg-red-50 p-3 text-sm text-red-600">
+
+    <span>{{ loginError() }}</span>
+
+  </div>
+}
+
+    <!-- Submit -->
+    <button
+      type="submit"
+      [disabled]="isLoading()"
+      class="auth-small-medium-text w-full bg-[#155DFC]
+             text-white py-3 rounded-md
+             font-semibold hover:bg-blue-700
+             transition-colors  disabled:cursor-not-allowed
+         disabled:opacity-60">
+      @if (isLoading()) {
+    Signing in...
+  } @else {
+    Login
+  }
+    </button>
+
+  </form>
+
+  <p class="auth-small-medium-text text-center text-sm text-gray-500 mt-6">
+    Don't have an account?
+    <a routerLink="/register"
+       class="auth-small-medium-text text-blue-600 font-semibold">
+      Create Account
+    </a>
+  </p>
+
+</div>
+

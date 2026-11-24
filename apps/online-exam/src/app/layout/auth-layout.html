@@ -1,0 +1,151 @@
+
+<div class="min-h-screen grid grid-cols-1 lg:grid-cols-2">
+
+  <!-- Left Panel -->
+
+<aside
+  class="hidden lg:flex min-h-screen flex-col
+         bg-gradient-to-br from-[#F5F9FF]
+         via-[#E6F1FF] to-[#C5DEFF]
+         px-12 xl:px-20 py-12">
+
+  <!-- Logo -->
+  <div class="flex items-center gap-2 text-[#155DFC]">
+    <svg lucideFolderCode
+         [size]="18"
+         [strokeWidth]="1.8">
+    </svg>
+
+    <span class="text-[14px] font-semibold tracking-tight">
+      Exam App
+    </span>
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex flex-1 items-center">
+
+    <div class="w-full max-w-[420px] mx-auto">
+
+      <h1
+        class="text-[22px] leading-[1.35]
+               font-bold tracking-[-0.5px]
+               text-[#111827] mb-10">
+        Empower your learning journey
+        with our smart exam platform.
+      </h1>
+
+      <div class="space-y-7">
+
+        <!-- Tailored Diplomas -->
+        <div class="flex items-start gap-4">
+
+
+<div
+  class="flex w-[36px] h-[36px] shrink-0
+         items-center justify-center
+         border-2 border-[#155DFC]
+         rounded-none">
+
+  <svg
+    lucideBrain
+    [size]="24"
+    [strokeWidth]="2"
+    class="text-[#155DFC]">
+  </svg>
+
+</div>
+
+
+          <div>
+
+<h3 class="auth-feature-title text-[#155DFC]">
+  Tailored Diplomas
+</h3>
+
+
+            <p class="auth-feature-description text-[#475569] mt-3">
+              Choose from specialized tracks like
+              Frontend, Backend, and Mobile Development.
+            </p>
+          </div>
+        </div>
+
+        <!-- Focused Exams -->
+        <div class="flex items-start gap-4">
+<div
+  class="flex w-[36px] h-[36px] shrink-0
+         items-center justify-center
+         border-2 border-[#155DFC]
+         rounded-none">
+
+  <svg lucideBookOpenCheck
+               [size]="22"
+               [strokeWidth]="1.6"
+               class="text-[#155DFC] shrink-0">
+          </svg>
+
+</div>
+
+
+          <div>
+            <h3 class="auth-feature-title text-[#155DFC]">
+  Focused Exams
+</h3>
+
+            <p class="auth-feature-description text-[#475569] mt-3">
+              Access topic-specific tests including
+              HTML, CSS, JavaScript, and more.
+            </p>
+          </div>
+        </div>
+
+        <!-- Smart Multi-Step Forms -->
+        <div class="flex items-start gap-4">
+
+          <div
+  class="flex w-[36px] h-[36px] shrink-0
+         items-center justify-center
+         border-2 border-[#155DFC]
+         rounded-none">
+
+   <svg lucideRectangleEllipsis
+               [size]="22"
+               [strokeWidth]="1.6"
+               class="text-[#155DFC] shrink-0">
+          </svg>
+
+</div>
+
+
+
+          <div>
+           <h3 class="auth-feature-title text-[#155DFC]">
+  Smart Multi-Step Forms
+</h3>
+
+            <p class="auth-feature-description text-[#475569] mt-3">
+              Choose from specialized tracks like
+              Frontend, Backend, and Mobile Development.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</aside>
+
+
+  <!-- Right Panel -->
+  <main class="flex items-center justify-center
+               bg-white px-6 py-12">
+
+    <div class="w-full max-w-sm">
+      <router-outlet />
+    </div>
+
+  </main>
+
+</div>
+
+
